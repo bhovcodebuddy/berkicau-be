@@ -4,19 +4,26 @@ import (
 	"encoding/json"
 	"net/http"
 	"ngobar/berkicau/requests"
+	"ngobar/berkicau/services"
 )
 
-type RegistrationHandler struct {
+type registrationHandler struct {
+	userService services.UserService
 }
 
-func GenerateResponse(writter http.ResponseWriter, httpCode int, resp interface{}) {
+func NewRegistrationHandler() registrationHandler {
+	userService := services.NewUserService()
+	return registrationHandler{userService: userService}
+}
+
+func generateResponse(writter http.ResponseWriter, httpCode int, resp interface{}) {
 	response, _ := json.Marshal(resp)
 	writter.Header().Set("Content-Type", "application/json")
 	writter.WriteHeader(httpCode)
 	writter.Write(response)
 }
 
-func DoRegistration(writter http.ResponseWriter, request *http.Request) {
+func (h *registrationHandler) DoRegistration(writter http.ResponseWriter, request *http.Request) {
 
 	var bodyRequest requests.RegistrationRequest
 
@@ -27,16 +34,17 @@ func DoRegistration(writter http.ResponseWriter, request *http.Request) {
 			"status":  false,
 			"message": "Invalid request body",
 		}
-		GenerateResponse(writter, http.StatusBadRequest, responseData)
+		generateResponse(writter, http.StatusBadRequest, responseData)
 		return
 	}
 
-	//do register here
+	//TODO: do register here
+	h.userService.RegisterNewUser(bodyRequest)
 
 	responseData := map[string]interface{}{
 		"status":  true,
 		"message": "Registration succeed",
 	}
 
-	GenerateResponse(writter, http.StatusOK, responseData)
+	generateResponse(writter, http.StatusOK, responseData)
 }

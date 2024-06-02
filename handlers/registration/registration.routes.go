@@ -1,12 +1,14 @@
 package registration
 
-import "github.com/gorilla/mux"
+import (
+	"github.com/gorilla/mux"
+)
 
 //init router
 func RegistrationRouter(router *mux.Router) *mux.Router {
-
+	h := NewRegistrationHandler()
 	route := router.PathPrefix("/register").Subrouter()
-	route.HandleFunc("", DoRegistration).Methods("POST")
+	route.HandleFunc("", h.DoRegistration).Methods("POST")
 
-	return route
+	return router
 }
