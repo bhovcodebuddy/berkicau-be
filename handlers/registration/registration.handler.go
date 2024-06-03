@@ -38,12 +38,11 @@ func (h *registrationHandler) DoRegistration(writter http.ResponseWriter, reques
 		return
 	}
 
-	//TODO: do register here
-	h.userService.RegisterNewUser(bodyRequest)
+	status, msg := h.userService.RegisterNewUser(bodyRequest)
 
 	responseData := map[string]interface{}{
-		"status":  true,
-		"message": "Registration succeed",
+		"status":  status,
+		"message": msg,
 	}
 
 	generateResponse(writter, http.StatusOK, responseData)

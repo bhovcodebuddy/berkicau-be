@@ -17,8 +17,7 @@ type userService struct {
 }
 
 func NewUserService() UserService {
-	userRepo := repositories.NewUserRepository(helper.DB)
-	return &userService{userRepo: userRepo}
+	return &userService{userRepo: repositories.NewUserRepository(helper.DB)}
 }
 
 func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (valid bool, message string) {
@@ -27,7 +26,7 @@ func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (val
 		return false, err.Error()
 	}
 
-	if &user != nil {
+	if user.Email != "" {
 		return false, "Email is already registered"
 	}
 
@@ -36,7 +35,7 @@ func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (val
 		return false, err.Error()
 	}
 
-	if &user != nil {
+	if user.Username != "" {
 		return false, "Username is already used"
 	}
 
@@ -56,5 +55,5 @@ func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (val
 		return false, err.Error()
 	}
 
-	return true, "Success"
+	return true, "Registration succeed"
 }
