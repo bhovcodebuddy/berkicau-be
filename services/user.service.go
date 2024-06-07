@@ -2,9 +2,11 @@ package services
 
 import (
 	"ngobar/berkicau/helper"
+	"ngobar/berkicau/middlewares"
 	"ngobar/berkicau/models"
 	"ngobar/berkicau/repositories"
 	"ngobar/berkicau/requests"
+	"os"
 )
 
 type UserService interface {
@@ -77,6 +79,8 @@ func (s *userService) CheckLoginInformation(request requests.LoginRequest) (vali
 	if request.Password != user.Password {
 		return false, "Password does not match"
 	}
+
+	middlewares.Authenticate(user.ID, os.Getenv("JWT_SECRET"))
 
 	return true, "Login success"
 }
