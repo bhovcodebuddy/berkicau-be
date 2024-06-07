@@ -2,9 +2,11 @@ package services
 
 import (
 	"ngobar/berkicau/helper"
+	"ngobar/berkicau/middlewares"
 	"ngobar/berkicau/models"
 	"ngobar/berkicau/repositories"
 	"ngobar/berkicau/requests"
+	"os"
 )
 
 type UserService interface {
@@ -21,7 +23,7 @@ func NewUserService() UserService {
 }
 
 func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (valid bool, message string) {
-	err := requests.Validate(request)
+	err := request.Validate()
 	if err != nil {
 		return false, err.Error()
 	}
@@ -64,5 +66,21 @@ func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (val
 }
 
 func (s *userService) CheckLoginInformation(request requests.LoginRequest) (valid bool, message string) {
+	err := request.Validate()
+	if err != nil {
+		return false, err.Error()
+	}
+
+	user, err := s.userRepo.GetDataByUsername(request.Username)
+	if err != nil {
+		return false, err.Error()
+	}
+
+	if request.Password != user.Password {
+		return false, "Password does not match"
+	}
+
+	middlewares.Authenticate(user.ID, os.Getenv("JWT_SECRET"))
+
 	return true, "Login success"
 }

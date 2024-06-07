@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"ngobar/berkicau/requests"
 	"ngobar/berkicau/services"
-	"ngobar/berkicau/utils"
+	"ngobar/berkicau/utils/http"
 )
 
 type registrationHandler struct {
