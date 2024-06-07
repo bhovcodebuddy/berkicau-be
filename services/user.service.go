@@ -9,7 +9,7 @@ import (
 
 type UserService interface {
 	RegisterNewUser(requests.RegistrationRequest) (valid bool, message string)
-	// CheckLoginInformation(requests.RegistrationRequest) (valid bool, message string)
+	CheckLoginInformation(requests.LoginRequest) (valid bool, message string)
 }
 
 type userService struct {
@@ -17,17 +17,21 @@ type userService struct {
 }
 
 func NewUserService() UserService {
-	userRepo := repositories.NewUserRepository(helper.DB)
-	return &userService{userRepo: userRepo}
+	return &userService{userRepo: repositories.NewUserRepository(helper.DB)}
 }
 
 func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (valid bool, message string) {
+	err := requests.Validate(request)
+	if err != nil {
+		return false, err.Error()
+	}
+
 	user, err := s.userRepo.GetDataByEmail(request.Email)
 	if err != nil {
 		return false, err.Error()
 	}
 
-	if &user != nil {
+	if user.Email != "" {
 		return false, "Email is already registered"
 	}
 
@@ -36,7 +40,7 @@ func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (val
 		return false, err.Error()
 	}
 
-	if &user != nil {
+	if user.Username != "" {
 		return false, "Username is already used"
 	}
 
@@ -56,5 +60,9 @@ func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (val
 		return false, err.Error()
 	}
 
-	return true, "Success"
+	return true, "Registration success"
+}
+
+func (s *userService) CheckLoginInformation(request requests.LoginRequest) (valid bool, message string) {
+	return true, "Login success"
 }
