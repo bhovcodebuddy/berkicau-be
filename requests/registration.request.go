@@ -10,7 +10,7 @@ type RegistrationRequest struct {
 	PasswordConfirmation string `json:"passwordConfirmation"`
 }
 
-func Validate(r RegistrationRequest) error {
+func (r *RegistrationRequest) Validate() error {
 	if r.Email == "" {
 		return errors.New("email is required")
 	}

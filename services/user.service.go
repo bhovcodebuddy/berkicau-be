@@ -21,7 +21,7 @@ func NewUserService() UserService {
 }
 
 func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (valid bool, message string) {
-	err := requests.Validate(request)
+	err := request.Validate()
 	if err != nil {
 		return false, err.Error()
 	}
@@ -64,5 +64,19 @@ func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (val
 }
 
 func (s *userService) CheckLoginInformation(request requests.LoginRequest) (valid bool, message string) {
+	err := request.Validate()
+	if err != nil {
+		return false, err.Error()
+	}
+
+	user, err := s.userRepo.GetDataByUsername(request.Username)
+	if err != nil {
+		return false, err.Error()
+	}
+
+	if request.Password != user.Password {
+		return false, "Password does not match"
+	}
+
 	return true, "Login success"
 }
