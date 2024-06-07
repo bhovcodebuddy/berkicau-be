@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"ngobar/berkicau/requests"
 	"ngobar/berkicau/services"
+	"ngobar/berkicau/utils"
 )
 
 type registrationHandler struct {
@@ -14,13 +15,6 @@ type registrationHandler struct {
 func NewRegistrationHandler() registrationHandler {
 	userService := services.NewUserService()
 	return registrationHandler{userService: userService}
-}
-
-func generateResponse(writter http.ResponseWriter, httpCode int, resp interface{}) {
-	response, _ := json.Marshal(resp)
-	writter.Header().Set("Content-Type", "application/json")
-	writter.WriteHeader(httpCode)
-	writter.Write(response)
 }
 
 func (h *registrationHandler) DoRegistration(writter http.ResponseWriter, request *http.Request) {
@@ -34,7 +28,7 @@ func (h *registrationHandler) DoRegistration(writter http.ResponseWriter, reques
 			"status":  false,
 			"message": "Invalid request body",
 		}
-		generateResponse(writter, http.StatusBadRequest, responseData)
+		utils.GenerateResponse(writter, http.StatusBadRequest, responseData)
 		return
 	}
 
@@ -45,5 +39,5 @@ func (h *registrationHandler) DoRegistration(writter http.ResponseWriter, reques
 		"message": msg,
 	}
 
-	generateResponse(writter, http.StatusOK, responseData)
+	utils.GenerateResponse(writter, http.StatusOK, responseData)
 }

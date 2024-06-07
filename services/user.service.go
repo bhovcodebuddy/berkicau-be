@@ -9,7 +9,7 @@ import (
 
 type UserService interface {
 	RegisterNewUser(requests.RegistrationRequest) (valid bool, message string)
-	// CheckLoginInformation(requests.RegistrationRequest) (valid bool, message string)
+	CheckLoginInformation(requests.LoginRequest) (valid bool, message string)
 }
 
 type userService struct {
@@ -21,6 +21,11 @@ func NewUserService() UserService {
 }
 
 func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (valid bool, message string) {
+	err := requests.Validate(request)
+	if err != nil {
+		return false, err.Error()
+	}
+
 	user, err := s.userRepo.GetDataByEmail(request.Email)
 	if err != nil {
 		return false, err.Error()
@@ -55,5 +60,9 @@ func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (val
 		return false, err.Error()
 	}
 
-	return true, "Registration succeed"
+	return true, "Registration success"
+}
+
+func (s *userService) CheckLoginInformation(request requests.LoginRequest) (valid bool, message string) {
+	return true, "Login success"
 }
