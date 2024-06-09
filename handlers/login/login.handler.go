@@ -30,11 +30,12 @@ func (h *loginHandler) DoLogin(writter http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	status, msg := h.userService.CheckLoginInformation(bodyRequest)
+	status, msg, token := h.userService.GetLoginInformation(bodyRequest)
 
 	responseData := map[string]interface{}{
 		"status":  status,
 		"message": msg,
+		"token": &token,
 	}
 
 	utils.GenerateResponse(writter, http.StatusOK, responseData)

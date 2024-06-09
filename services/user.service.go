@@ -11,7 +11,7 @@ import (
 
 type UserService interface {
 	RegisterNewUser(requests.RegistrationRequest) (valid bool, message string)
-	CheckLoginInformation(requests.LoginRequest) (valid bool, message string)
+	GetLoginInformation(requests.LoginRequest) (valid bool, message string, token *string)
 }
 
 type userService struct {
@@ -65,22 +65,25 @@ func (s *userService) RegisterNewUser(request requests.RegistrationRequest) (val
 	return true, "Registration success"
 }
 
-func (s *userService) CheckLoginInformation(request requests.LoginRequest) (valid bool, message string) {
+func (s *userService) GetLoginInformation(request requests.LoginRequest) (valid bool, message string, token *string) {
 	err := request.Validate()
 	if err != nil {
-		return false, err.Error()
+		return false, err.Error(), nil
 	}
 
 	user, err := s.userRepo.GetDataByUsername(request.Username)
 	if err != nil {
-		return false, err.Error()
+		return false, err.Error(), nil
 	}
 
 	if request.Password != user.Password {
-		return false, "Password does not match"
+		return false, "Password does not match", nil
 	}
 
-	middlewares.Authenticate(user.ID, os.Getenv("JWT_SECRET"))
+	result, err := middlewares.Authenticate(user.ID, os.Getenv("JWT_SECRET"))
+	if err != nil {
+		return false, err.Error(), nil
+	}
 
-	return true, "Login success"
+	return true, "Login success", &result
 }
